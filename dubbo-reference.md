@@ -56,6 +56,10 @@ serviceInstancesChangedListener#addListenerAndNotify -> serviceDiscoveryRegistry
 
 ![](./images/DubboProtocolrefer.png)
 
+全部的调用堆栈如下：
+
+![](./images/full-debug-stack.png)
+
 获取 invoker 流程到此就结束了，接下来是根据 invoker 创建代理对象：
 
 ![](./images/ReferenceConfigcreateProxy.png)
