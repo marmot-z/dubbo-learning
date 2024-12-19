@@ -1,5 +1,5 @@
 本地启动微服务项目开发时，偶尔会出现以下类似问题：
-![](./images/no-provider-available.jpg)
+![](./images/no-provider-available.png)
 
 根据堆栈信息，我们可以看到是服务对应的 invokers 为空。这是什么原因导致的呢？
 ![](./images/error-stack.png)
