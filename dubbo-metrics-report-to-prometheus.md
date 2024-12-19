@@ -11,6 +11,13 @@
 
 ![img.png](images/PrometheusMetricsReporter.doInit.png)
 
+# Prometheus 如何拉取指标数据
+
+引入 dubbo-spring-boot-actuator 依赖，其在 spring boot 自动注册时，会将 spring 的 MeterRegistry 添加到 dubbo 中的 CompositeMeterRegistry 中，
+后续 dubbo 指标采集的时候，会将指标注册到 spring 中的 MeterRegistry，从而可以通过 spring 的 /management/prometheus 接口拉取到 dubbo 指标数据。
+
+![img.png](images/DubboMetricsBinder.onApplicationEvent.png)
+
 # dubbo 如何采集指标数据
 dubbo 在 rpc 调用时通过 MetricsFilter、MetricsClusterFilter(只作用在消费端) 对指标数据进行采集。
 
