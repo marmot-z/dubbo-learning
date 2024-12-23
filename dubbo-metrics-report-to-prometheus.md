@@ -1,5 +1,7 @@
 # dubbo 如何上报指标数据到 Prometheus
 
+![](images/dubbo-metrics.png)
+
 应用启动后初始化指标上报逻辑
 ![img.png](images/DefaultApplicationDeployer.initialize.png)
 
