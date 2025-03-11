@@ -97,11 +97,11 @@ sentinel.dubbo.provider.filter=com.alibaba.csp.sentinel.adapter.dubbo.SentinelDu
 
 2，接口响应慢
 此时在消费方配置熔断规则，生效速度会比在提供方配置快
-![[./images/circuit-breaker-sequence1.png]]
+![](./images/circuit-breaker-sequence1.png)
 
 3，接口响应慢，并且调用频率高
 如果接口响应慢，并且调用频率高，则可能会耗尽服务提供方的 dubbo 线程池，从而导致后续请求会在阻塞队列中等待。此时提供方的熔断规则生效时长会更慢
-![[./images/circuit-breaker-sequence2.png]]
+![](./images/circuit-breaker-sequence2.png)
 
 综合以上讨论，在服务消费方设置熔断规则比在服务提供方设置规则要好一些
 ## 熔断的范围
@@ -112,7 +112,7 @@ dubbo 熔断规则支持三种维度：
 - 方法级别（如：`com.example.FooServiceImpl:sayHello(java.lang.String)`）
 
 它们之间的区别主要是颗粒度不同，影响范围不一样：
-![[./images/circuit-breaker-granularity.png]]
+![](./images/circuit-breaker-granularity.png)
 
 如果服务提供方部分故障时，应用级别的熔断会使得消费方熔断所有外部请求，造成消费方无法对外提供服务。如果服务提供方全局故障时，方法级别的熔断会浪费很多次消费方请求。所以综合来说，使用接口级别进行熔断较为合理。
 
