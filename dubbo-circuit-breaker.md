@@ -180,3 +180,5 @@ public class SentinelConfig implements ApplicationListener<ApplicationReadyEvent
 1. 启动时从 zk 读取配置规则 rule1
 2. 启动完毕后加载规则 rule2，项目中会有规则 rule1 + rule2
 3. 运行时从 zk 加载规则 rule3，会将原先的规则清空，只保留 rule3
+
+注意：如果下发的规则为空，本地会不更新规则，直接退出
