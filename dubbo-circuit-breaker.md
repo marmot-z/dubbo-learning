@@ -174,3 +174,6 @@ public class SentinelConfig implements ApplicationListener<ApplicationReadyEvent
     }  
 }
 ```
+
+其与外部数据源搭配使用的时候，熔断规则生效时间顺序如下：
+![](./assets/plantuml/circuit-breaker-rule-set-sequece-flow.png)

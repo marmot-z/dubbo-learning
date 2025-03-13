@@ -1,3 +1,4 @@
+```plantuml
 @startuml
 Consumer -> Consumer: SphU.entry
 Consumer --> Provider: 调用
@@ -15,8 +16,9 @@ deactivate Provider
 note right of Provider: 提供方限流
 @enduml
 
-// -------------------------------------
+```
 
+```plantuml
 @startchen
 entity Concsumer1 {
   All References
@@ -44,3 +46,25 @@ entity Concsumer3 {
   }
 }
 @endchen
+```
+
+```plantuml
+@startuml
+participant ZK #lightblue
+participant APP #lightyellow
+
+APP -> APP: 开始启动
+activate APP #lightgreen
+ZK -> APP: 熔断规则 rule1 下发
+note right: rule1
+APP -> APP: 初始化熔断规则 rule2
+note right: rule1, rule2
+APP -> APP: 启动完毕
+deactivate APP
+
+ZK -> APP: 再次下发熔断规则 rule3
+note right: right3
+
+
+@enduml
+```
