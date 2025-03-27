@@ -1,105 +1,66 @@
 ```plantuml
 @startuml
 
-' 定义参与者并设置颜色
-participant DefaultModuleDeployer  #ADD8E6
-participant ServiceConfig  #90EE90
-participant InjvmProtocol  #FFFF99
-participant RegistryProtocol  #FFCC99
-participant DubboProtocol  #DDA0DD
-participant AbstractRegistry  #C2B280
-participant ServiceDiscoveryRegistry  #87CEEB
+skinparam backgroundColor White
+skinparam sequenceParticipantBackgroundColor LightBlue
 
-' DefaultModuleDeployer 开始生命线
-activate DefaultModuleDeployer
-DefaultModuleDeployer -> ServiceConfig : 导出服务
+participant DefaultModuleDeployer as DMD #lightblue
+participant ServiceConfig as SC #lightgreen
+participant InjvmProtocol as IP #lightyellow
+participant RegistryProtocol as RP #lightgray
+participant DubboProtocol as DP #lightcyan
+participant AbstractRegistry as AR #lightpink
+participant ServiceDiscoveryRegistry as SDR #lightsalmon
+participant ServiceNameMapping as SNM #lightsteelblue
 
-' ServiceConfig 开始生命线
-activate ServiceConfig
-ServiceConfig -> InjvmProtocol : 本地导出
+activate DMD
+DMD -> SC : 导出服务
 
-' InjvmProtocol 自调用
-activate InjvmProtocol
-InjvmProtocol -> InjvmProtocol : export
+activate SC
+SC -> IP : 本地导出
 
-' 备注
-note right
-在本地记录服务名和 invoker 的对应关系
-end note
+activate IP
+IP -> IP : export
+note right: 在本地记录服务名和\ninvoker 的对应关系
 
-InjvmProtocol --> ServiceConfig
+deactivate IP
+SC <--- IP
 
-deactivate InjvmProtocol
+SC -> RP : 远程导出
 
-' ServiceConfig 远程导出
-ServiceConfig -> RegistryProtocol : 远程导出
+activate RP
+RP -> DP : 本地导出
 
-' RegistryProtocol 本地导出
-activate RegistryProtocol
-RegistryProtocol -> DubboProtocol : 本地导出
+activate DP
+DP -> DP : export
+note right: 开启对应协议的服务，\n如：启动一个 dubbo 协议的 netty server
 
-' DubboProtocol 自调用
-activate DubboProtocol
-DubboProtocol -> DubboProtocol : export
+deactivate DP
 
-' 备注
-note right
-开启对应协议的服务，如：
-启动一个 dubbo 协议的 netty server
-end note
+RP -> AR : 接口级别注册
 
-deactivate DubboProtocol
+activate AR
+AR -> AR : register
+note right: 接口级别注册时，在注册中心\n创建对应服务节点，等待消费方订阅
 
-' RegistryProtocol 进行接口级别注册
-RegistryProtocol -> AbstractRegistry : 接口级别注册
+deactivate AR
 
-' AbstractRegistry 自调用
-activate AbstractRegistry
-AbstractRegistry -> AbstractRegistry : register
+RP -> SDR : 应用级别注册
 
-' 备注
-note right
-接口级别注册时，在注册中心
-创建对应服务节点，等待消费方订阅
-end note
+activate SDR
+SDR -> SDR : register
+note right: 应用级别注册是，\n将服务的 meta 信息写入到本地
 
-deactivate AbstractRegistry
+deactivate SDR
 
-' RegistryProtocol 进行应用级别注册
-RegistryProtocol -> ServiceDiscoveryRegistry : 应用级别注册
+SC <--- RP
 
-' ServiceDiscoveryRegistry 自调用
-activate ServiceDiscoveryRegistry
-ServiceDiscoveryRegistry -> ServiceDiscoveryRegistry : register
+SC -> SNM : 上传映射
+note right: 将服务与 app 映射关系写入\n注册中心的 /mapping 路径下
+SC ---> DMD : 服务导出完毕
 
-' 备注
-note right
-应用级别注册是，将服务的
-meta 信息写入到本地
-end note
-
-deactivate ServiceDiscoveryRegistry
-
-RegistryProtocol --> ServiceConfig
-
-deactivate RegistryProtocol
-
-ServiceConfig --> DefaultModuleDeployer : 服务导出完毕
-
-deactivate ServiceConfig
-
-' DefaultModuleDeployer 完成启动
-DefaultModuleDeployer -> DefaultModuleDeployer : dubbo 启动完毕
-
-' 备注
-note right
-1. 对外暴露 metadataService，使得消费方
-可以拉取本地服务的 meta 信息；
-2. 拼接本机实例信息，注册到注册中心的
-/services 节点，使得消费方可以发现该服务提供实例
-end note
-
-deactivate DefaultModuleDeployer
+DMD -> DMD : dubbo 启动完毕
+note right: 1，对外暴露 metadataService，使得消费方\n可以拉取本地服务的 meta 信息；2，拼接本机实例信息，\n注册到注册中心的 /services 节点，使得消费方可以发现该服务提供实例
 
 @enduml
 ```
@@ -125,7 +86,9 @@ deactivate DefaultModuleDeployer
 - ServiceDiscoveryRegistry 节点调用自身，请求内容为：register
 - 在右侧生成一个备注：应用级别注册是，将服务的 meta 信息写入到本地
 - RegistryProtocol 节点返回到 ServiceConfig 节点，使用虚线
-- ServiceConfig 节点返回 DefaultModuleDeployer 节点，返回内容为：服务导出完毕
+- ServiceConfig 节点请求 ServiceNameMapping 节点，请求内容为：上传映射
+- 在右侧生成一个备注：将服务与app映射关系写入注册中心的/mapping路径下
+- ServiceConfig 节点返回 DefaultModuleDeployer 节点，使用虚线，返回内容为：服务导出完毕
 - DefaultModuleDeployer 节点请求自身，请求内容为：dubbo 启动完毕
 - 在右侧生成一个备注：1，对外暴露 metadataService，使得消费方可以拉取本地服务的 meta 信息；2，拼接本机实例信息，注册到注册中心的 /services 节点，使得消费方可以发现该服务提供实例
 
